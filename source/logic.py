@@ -1,136 +1,187 @@
 from __future__ import annotations
 
-from .models import GameState, GameSnapshot, Entity, Direction
-from .config import EntityKind, GameMode, Difficulty, CellType
-from .maze_data import load_level_txt, create_dummy_maze
+from typing import List
+
+from .config import Difficulty
+from .models import (
+    Maze,
+    GameState,
+    Coord,
+    Direction,
+    CellType,
+    GameStatus,
+    Enemy,
+    EnemyType,
+)
 
 
-def create_game_for_level(level_name: str) -> GameState:
+def initial_state(maze: Maze, difficulty: Difficulty = Difficulty.NORMAL) -> GameState:
     """
-    tạo một GameState mới từ level cố định (đọc file text).
-
-    hiện tại dùng cho việc: chơi level_01, level_02...
-    sau này adventure mode sẽ gọi hàm này.
+    Khởi tạo GameState từ Maze.
     """
-    maze = load_level_txt(level_name)
-    player = Entity(kind=EntityKind.PLAYER, pos=maze.start)
-    enemies: list[Entity] = []
-
+    enemies: List[Enemy] = [Enemy(e.pos, e.type) for e in maze.enemies_start]
     state = GameState(
         maze=maze,
-        player=player,
+        player_pos=maze.start,
         enemies=enemies,
-        mode=GameMode.ADVENTURE,
-        difficulty=Difficulty.EASY,
+        has_key=False,
+        gate_open=False,
+        status=GameStatus.RUNNING,
+        move_count=0,
+        difficulty=difficulty,
     )
-    _push_snapshot(state)  # lưu trạng thái ban đầu cho undo sau này
     return state
 
 
-def create_dummy_gamestate() -> GameState:
-    """
-    tạo GameState dummy với mê cung rỗng.
-    giữ lại để dùng debug nếu cần, không dùng trong game chính.
-    """
-    maze = create_dummy_maze()
-    player = Entity(kind=EntityKind.PLAYER, pos=maze.start)
-    enemies: list[Entity] = []
-    state = GameState(
-        maze=maze,
-        player=player,
-        enemies=enemies,
-        mode=GameMode.ADVENTURE,
-        difficulty=Difficulty.EASY,
-    )
-    _push_snapshot(state)
-    return state
+# ============================
+# CORE TURN LOGIC
+# ============================
 
 
-def _push_snapshot(state: GameState) -> None:
+def apply_turn(state: GameState, direction: Direction) -> None:
     """
-    lưu một snapshot mới vào history.
-
-    mỗi lần player chuẩn bị di chuyển (hoặc có thay đổi lớn),
-    ta gọi hàm này để sau còn undo/redo được.
+    Một lượt chơi:
+      1. Player di chuyển 1 ô (nếu hợp lệ).
+      2. Xử lý key / trap / exit.
+      3. Enemy di chuyển.
+      4. Check va chạm (bao gồm trường hợp "đi xuyên qua nhau" -> chết).
     """
-    snap = GameSnapshot(
-        maze=state.maze,
-        player=Entity(kind=state.player.kind, pos=state.player.pos, alive=state.player.alive),
-        enemies=[Entity(kind=e.kind, pos=e.pos, alive=e.alive) for e in state.enemies],
-        move_count=state.move_count,
-        status=state.status,
-    )
-    # nếu trước đó đã undo, cắt bỏ các snapshot "tương lai"
-    state.history = state.history[: state.history_index + 1]
-    state.history.append(snap)
-    state.history_index += 1
-
-
-def move_player(state: GameState, direction: Direction) -> None:
-    """
-    xử lý di chuyển người chơi 1 ô theo direction.
-
-    - chặn ra ngoài biên
-    - chặn đi xuyên tường
-    - cập nhật vị trí và số bước
-    - nếu đi vào ô EXIT thì set trạng thái WIN
-    """
-    if state.status != "RUNNING":
-        # nếu đã win/lose rồi thì không cho di chuyển nữa
+    if state.status is not GameStatus.RUNNING:
         return
 
-    dx, dy = 0, 0
-    if direction == "UP":
-        dy = -1
-    elif direction == "DOWN":
-        dy = 1
-    elif direction == "LEFT":
-        dx = -1
-    elif direction == "RIGHT":
-        dx = 1
-    elif direction == "STAY":
-        dx = dy = 0
+    maze = state.maze
+    old_player_pos = state.player_pos
 
-    if dx == dy == 0:
-        # stay hiện tại chưa xử lý gì, sau này có thể coi là 1 lượt pass
+    # 1. Player move (edge-based walls + gate)
+    target = old_player_pos.moved(direction)
+    if not _is_inside(maze, target):
+        return
+    if _edge_blocked(maze, state, old_player_pos, direction):
         return
 
-    x, y = state.player.pos
-    nx, ny = x + dx, y + dy
-
-    # check ra ngoài biên
-    if not (0 <= nx < state.maze.width and 0 <= ny < state.maze.height):
-        return
-
-    cell = state.maze.grid[ny][nx]
-    if cell == CellType.WALL:
-        # gặp tường thì không đi được
-        return
-
-    # di chuyển hợp lệ: lưu snapshot trước rồi cập nhật
-    _push_snapshot(state)
-
-    state.player.pos = (nx, ny)
+    state.player_pos = target
     state.move_count += 1
 
-    if cell == CellType.EXIT:
-        state.status = "WIN"
+    # 2. xử lý ô player đứng
+    target_cell = maze.grid[target.y][target.x]
 
+    if target_cell == CellType.KEY:
+        state.has_key = True
+        # Phase 2: đơn giản hóa: lấy key là mở gate luôn
+        state.gate_open = True
+        maze.grid[target.y][target.x] = CellType.EMPTY
 
-def undo(state: GameState) -> None:
-    """
-    quay lại 1 bước trước đó bằng snapshot trong history.
-
-    hiện tại dùng tạm, sau này có thể mở rộng undo/redo nhiều bước.
-    """
-    if state.history_index <= 0:
+    if target_cell == CellType.TRAP:
+        state.status = GameStatus.LOSE
         return
 
-    state.history_index -= 1
-    snap = state.history[state.history_index]
+    if target_cell == CellType.EXIT:
+        state.status = GameStatus.WIN
+        return
 
-    state.maze = snap.maze
-    state.player = snap.player
-    state.enemies = snap.enemies
-    state.move_count = snap.move_count
-    state.status = snap.status
+    # 3. Enemy move
+    if state.enemies:
+        old_enemy_positions = [e.pos for e in state.enemies]
+        _move_enemies_towards_player(state)
+
+        # 4. Check enemy collide (bao gồm swap vị trí)
+        new_player_pos = state.player_pos
+        for enemy, old_e_pos in zip(state.enemies, old_enemy_positions):
+            # cùng ô
+            if enemy.pos == new_player_pos:
+                state.status = GameStatus.LOSE
+                return
+            # swap vị trí: enemy mới ở chỗ player cũ và ngược lại
+            if enemy.pos == old_player_pos and old_e_pos == new_player_pos:
+                state.status = GameStatus.LOSE
+                return
+
+
+# ============================
+# HELPERS
+# ============================
+
+
+def _is_inside(maze: Maze, c: Coord) -> bool:
+    return 0 <= c.x < maze.width and 0 <= c.y < maze.height
+
+
+def _edge_blocked(maze: Maze, state: GameState, c: Coord, direction: Direction) -> bool:
+    """
+    Kiểm tra cạnh giữa ô c và ô phía direction có bị chặn không
+    (tường edge hoặc gate đang đóng).
+    """
+    x, y = c.x, c.y
+    if direction == Direction.UP:
+        edge = ("h", x, y)  # giữa hàng y-1 và y
+    elif direction == Direction.DOWN:
+        edge = ("h", x, y + 1)
+    elif direction == Direction.LEFT:
+        edge = ("v", x, y)
+    else:  # RIGHT
+        edge = ("v", x + 1, y)
+
+    kind, ex, ey = edge
+
+    # Gate edge
+    if maze.gate_edge is not None:
+        gk, gx, gy = maze.gate_edge
+        if gk == kind and gx == ex and gy == ey:
+            # gate đóng => ai cũng không đi qua
+            if not state.gate_open:
+                return True
+
+    # Tường thường
+    if kind == "h":
+        return (ex, ey) in maze.h_walls
+    else:
+        return (ex, ey) in maze.v_walls
+
+
+def _move_enemies_towards_player(state: GameState) -> None:
+    """
+    AI đơn giản:
+      - White/Red mummy: tối đa 2 bước/lượt, luôn đi hướng giảm Manhattan distance
+      - Scorpion: 1 bước/lượt
+    Tôn trọng tường edge + gate.
+    """
+    maze = state.maze
+    if not state.enemies:
+        return
+
+    for enemy in state.enemies:
+        steps = 2 if enemy.type in (EnemyType.WHITE_MUMMY, EnemyType.RED_MUMMY) else 1
+        for _ in range(steps):
+            new_pos = _best_step_towards(maze, state, enemy.pos, state.player_pos)
+            if new_pos == enemy.pos:
+                break
+            enemy.pos = new_pos
+            if enemy.pos == state.player_pos:
+                # sẽ được check sau ở apply_turn
+                break
+
+
+def _best_step_towards(maze: Maze, state: GameState, start: Coord, target: Coord) -> Coord:
+    """
+    Thử 4 hướng, chọn hướng hợp lệ (không văng khỏi board, không bị tường/gate chặn)
+    làm giảm khoảng cách Manhattan. Nếu không có hướng nào tốt hơn thì đứng yên.
+    """
+    best = start
+    best_dist = _manhattan(start, target)
+
+    for direction in (Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT):
+        candidate = start.moved(direction)
+        if not _is_inside(maze, candidate):
+            continue
+        if _edge_blocked(maze, state, start, direction):
+            continue
+        d = _manhattan(candidate, target)
+        if d < best_dist:
+            best_dist = d
+            best = candidate
+
+    return best
+
+
+def _manhattan(a: Coord, b: Coord) -> int:
+    return abs(a.x - b.x) + abs(a.y - b.y)
