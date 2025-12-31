@@ -1,0 +1,42 @@
+{
+  "difficulty": "normal",
+  "mazeType": "8",
+  "player": {"x": 7, "y": 0, "direction": "down"},
+  "exit": {"x": 0, "y": 7},
+  "enemies": [
+    {"type": "white_mummy", "x": 4, "y": 0},
+    {"type": "white_mummy", "x": 0, "y": 5},
+    {"type": "scorpion", "x": 1, "y": 7}
+  ],
+  "key": {"x": 0, "y": 2},
+  "gate": {"x": 6, "y": 1},
+  "traps": [
+    {"x": 6, "y": 4}
+  ],
+  "walls": [
+    {"x": 0, "y": 3, "dir": "horizontal"},
+    {"x": 1, "y": 2, "dir": "horizontal"},
+    {"x": 1, "y": 3, "dir": "horizontal"},
+    {"x": 1, "y": 4, "dir": "horizontal"},
+    {"x": 1, "y": 5, "dir": "both"},
+    {"x": 1, "y": 6, "dir": "vertical"},
+    {"x": 2, "y": 3, "dir": "both"},
+    {"x": 2, "y": 4, "dir": "vertical"},
+    {"x": 2, "y": 5, "dir": "vertical"},
+    {"x": 3, "y": 4, "dir": "vertical"},
+    {"x": 3, "y": 7, "dir": "horizontal"},
+    {"x": 4, "y": 1, "dir": "both"},
+    {"x": 4, "y": 2, "dir": "horizontal"},
+    {"x": 4, "y": 4, "dir": "horizontal"},
+    {"x": 4, "y": 7, "dir": "vertical"},
+    {"x": 5, "y": 1, "dir": "horizontal"},
+    {"x": 5, "y": 3, "dir": "horizontal"},
+    {"x": 5, "y": 7, "dir": "horizontal"},
+    {"x": 6, "y": 2, "dir": "vertical"},
+    {"x": 6, "y": 3, "dir": "horizontal"},
+    {"x": 6, "y": 4, "dir": "both"},
+    {"x": 6, "y": 6, "dir": "horizontal"},
+    {"x": 7, "y": 2, "dir": "horizontal"},
+    {"x": 7, "y": 4, "dir": "vertical"}
+  ]
+}

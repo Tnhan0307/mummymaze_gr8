@@ -1,0 +1,21 @@
+{
+  "difficulty": "easy",
+  "mazeType": "6",
+  "player": {"x": 0, "y": 0, "direction": "right"},
+  "exit": {"x": 5, "y": 2},
+  "enemies": [
+    {"type": "white_mummy", "x": 2, "y": 4}
+  ],
+  "key": {},
+  "gate": {},
+  "traps": [],
+  "walls": [
+    {"x": 1, "y": 2, "dir": "vertical"},
+    {"x": 1, "y": 4, "dir": "horizontal"},
+    {"x": 2, "y": 1, "dir": "horizontal"},
+    {"x": 2, "y": 4, "dir": "vertical"},
+    {"x": 3, "y": 1, "dir": "vertical"},
+    {"x": 4, "y": 2, "dir": "both"},
+    {"x": 5, "y": 4, "dir": "both"}
+  ]
+}

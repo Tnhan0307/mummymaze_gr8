@@ -1,0 +1,152 @@
+{
+"difficulty": "hard",
+"mazeType": "8",
+"maze_size": 8,
+"player": {
+    "x": 6,
+    "y": 5,
+    "direction": "down"
+},
+"exit": {
+    "x": 4,
+    "y": 0
+},
+"enemies": [
+    {
+    "type": "scorpion",
+    "x": 5,
+    "y": 4
+    },
+    {
+    "type": "red_scorpion",
+    "x": 0,
+    "y": 6
+    }
+],
+"traps": [
+    {
+    "x": 0,
+    "y": 0
+    },
+    {
+    "x": 7,
+    "y": 0
+    }
+],
+"walls": [
+    { "x": 0, "y": 0, "dir": "horizontal" },
+    { "x": 2, "y": 0, "dir": "horizontal" },
+    { "x": 4, "y": 0, "dir": "horizontal" },
+    { "x": 5, "y": 0, "dir": "horizontal" },
+    { "x": 6, "y": 0, "dir": "horizontal" },
+    { "x": 7, "y": 0, "dir": "horizontal" },
+
+    { "x": 1, "y": 1, "dir": "horizontal" },
+    { "x": 2, "y": 1, "dir": "horizontal" },
+    { "x": 3, "y": 1, "dir": "horizontal" },
+    { "x": 4, "y": 1, "dir": "horizontal" },
+    { "x": 6, "y": 1, "dir": "horizontal" },
+    { "x": 7, "y": 1, "dir": "horizontal" },
+
+    { "x": 0, "y": 2, "dir": "horizontal" },
+    { "x": 1, "y": 2, "dir": "horizontal" },
+    { "x": 2, "y": 2, "dir": "horizontal" },
+    { "x": 3, "y": 2, "dir": "horizontal" },
+    { "x": 4, "y": 2, "dir": "horizontal" },
+    { "x": 5, "y": 2, "dir": "horizontal" },
+    { "x": 7, "y": 2, "dir": "horizontal" },
+
+    { "x": 0, "y": 3, "dir": "horizontal" },
+    { "x": 1, "y": 3, "dir": "horizontal" },
+    { "x": 4, "y": 3, "dir": "horizontal" },
+    { "x": 5, "y": 3, "dir": "horizontal" },
+    { "x": 6, "y": 3, "dir": "horizontal" },
+
+    { "x": 0, "y": 4, "dir": "horizontal" },
+    { "x": 1, "y": 4, "dir": "horizontal" },
+    { "x": 3, "y": 4, "dir": "horizontal" },
+    { "x": 4, "y": 4, "dir": "horizontal" },
+    { "x": 6, "y": 4, "dir": "horizontal" },
+    { "x": 7, "y": 4, "dir": "horizontal" },
+
+    { "x": 0, "y": 5, "dir": "horizontal" },
+    { "x": 2, "y": 5, "dir": "horizontal" },
+    { "x": 4, "y": 5, "dir": "horizontal" },
+    { "x": 5, "y": 5, "dir": "horizontal" },
+    { "x": 6, "y": 5, "dir": "horizontal" },
+    { "x": 7, "y": 5, "dir": "horizontal" },
+
+    { "x": 0, "y": 6, "dir": "horizontal" },
+    { "x": 1, "y": 6, "dir": "horizontal" },
+    { "x": 2, "y": 6, "dir": "horizontal" },
+    { "x": 4, "y": 6, "dir": "horizontal" },
+    { "x": 5, "y": 6, "dir": "horizontal" },
+    { "x": 7, "y": 6, "dir": "horizontal" },
+
+    { "x": 0, "y": 7, "dir": "horizontal" },
+    { "x": 1, "y": 7, "dir": "horizontal" },
+    { "x": 2, "y": 7, "dir": "horizontal" },
+    { "x": 3, "y": 7, "dir": "horizontal" },
+    { "x": 4, "y": 7, "dir": "horizontal" },
+    { "x": 5, "y": 7, "dir": "horizontal" },
+    { "x": 6, "y": 7, "dir": "horizontal" },
+    { "x": 7, "y": 7, "dir": "horizontal" },
+
+    { "x": 0, "y": 0, "dir": "vertical" },
+    { "x": 1, "y": 0, "dir": "vertical" },
+    { "x": 2, "y": 0, "dir": "vertical" },
+    { "x": 3, "y": 0, "dir": "vertical" },
+    { "x": 4, "y": 0, "dir": "vertical" },
+    { "x": 5, "y": 0, "dir": "vertical" },
+    { "x": 6, "y": 0, "dir": "vertical" },
+    { "x": 7, "y": 0, "dir": "vertical" },
+
+    { "x": 2, "y": 1, "dir": "vertical" },
+    { "x": 3, "y": 1, "dir": "vertical" },
+    { "x": 5, "y": 1, "dir": "vertical" },
+    { "x": 6, "y": 1, "dir": "vertical" },
+    { "x": 7, "y": 1, "dir": "vertical" },
+
+    { "x": 1, "y": 2, "dir": "vertical" },
+    { "x": 2, "y": 2, "dir": "vertical" },
+    { "x": 3, "y": 2, "dir": "vertical" },
+    { "x": 4, "y": 2, "dir": "vertical" },
+    { "x": 5, "y": 2, "dir": "vertical" },
+    { "x": 7, "y": 2, "dir": "vertical" },
+
+    { "x": 1, "y": 3, "dir": "vertical" },
+    { "x": 2, "y": 3, "dir": "vertical" },
+    { "x": 3, "y": 3, "dir": "vertical" },
+    { "x": 4, "y": 3, "dir": "vertical" },
+    { "x": 6, "y": 3, "dir": "vertical" },
+    { "x": 7, "y": 3, "dir": "vertical" },
+
+    { "x": 2, "y": 4, "dir": "vertical" },
+    { "x": 3, "y": 4, "dir": "vertical" },
+    { "x": 5, "y": 4, "dir": "vertical" },
+
+    { "x": 1, "y": 5, "dir": "vertical" },
+    { "x": 2, "y": 5, "dir": "vertical" },
+    { "x": 3, "y": 5, "dir": "vertical" },
+    { "x": 4, "y": 5, "dir": "vertical" },
+    { "x": 5, "y": 5, "dir": "vertical" },
+    { "x": 6, "y": 5, "dir": "vertical" },
+    { "x": 7, "y": 5, "dir": "vertical" },
+
+    { "x": 1, "y": 6, "dir": "vertical" },
+    { "x": 2, "y": 6, "dir": "vertical" },
+    { "x": 4, "y": 6, "dir": "vertical" },
+    { "x": 5, "y": 6, "dir": "vertical" },
+    { "x": 6, "y": 6, "dir": "vertical" },
+    { "x": 7, "y": 6, "dir": "vertical" },
+
+    { "x": 1, "y": 7, "dir": "vertical" },
+    { "x": 2, "y": 7, "dir": "vertical" },
+    { "x": 3, "y": 7, "dir": "vertical" },
+    { "x": 4, "y": 7, "dir": "vertical" },
+    { "x": 6, "y": 7, "dir": "vertical" },
+    { "x": 7, "y": 7, "dir": "vertical" }
+],
+"key": { "x": 4, "y": 3 },
+"gate": { "x": 5, "y": 1 }
+}
